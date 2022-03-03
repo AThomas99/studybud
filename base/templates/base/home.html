@@ -6,7 +6,10 @@
 <div>
     <div>
         {% for room in rooms %}
+            <span>Username: @{{room.host.username}}</span>
             <h3>{{ room.id }} - <a href="{% url 'room' room.id %}">{{room.name}}</a></h3>
+            <small>Topic: {{ room.topic.name }}</small>
+            <hr>
         {% endfor %}
     </div>
 </div>
