@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages # using flash messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm # Django user creation form
 from django.db.models import Q
 
 from .models import Room, Topic
@@ -15,8 +17,16 @@ from .forms import RoomForm
 
 # Function to login page
 def loginPage(request):
+    page = 'login'
+
+
+    # Restrict user on login page if is already logged in
+    if request.user.is_authenticated:
+        return redirect('home')
+
+
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username = request.POST.get('username').lower() # update - make all username entered be lowercase
         password = request.POST.get('password')
 
         # check if the user exists, if dont output a flash message
@@ -36,13 +46,34 @@ def loginPage(request):
             messages.error(request, 'Username or password does not exist') # use flash error message
             print(user)
 
-    context = {}
+    context = {'page': page}
     return render(request, 'base/auth/login_register.html', context)
     
 # Function to logout user
 def logoutUser(request):
     logout(request)
     return redirect('home')
+
+# Function to register user
+def registerPage(request):
+    form = UserCreationForm()
+    
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False) # get user credentials without commiting to the db
+            user.username = user.username.lower() # make all usernames lowercase
+            user.save()
+            login(request, user)
+            return redirect('home')
+
+        else:
+            messages.error(request, 'An error occured during registration')
+            
+    context = {'form': form}
+
+    return render(request, 'base/auth/login_register.html', context)
+
 
 # Create your views here.
 def home(request):
@@ -72,6 +103,8 @@ def room(request, pk):
 
 
 # Function to create room
+# Added a decorator to restrict unknown users from creating a room
+@login_required(login_url='login') 
 def createRoom(request):
     form = RoomForm()
     if request.method == 'POST': # check if it is post method
@@ -84,6 +117,7 @@ def createRoom(request):
 
 
 # Function to update room
+@login_required(login_url='login') 
 def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room) # adding instance to match the room
@@ -101,6 +135,7 @@ def updateRoom(request, pk):
 
 
 # Fundtion to delete room
+@login_required(login_url='login') 
 def deleteRoom(request, pk):
     room = Room.objects.get(id=pk)
 
