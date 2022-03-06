@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages # using flash messages
@@ -6,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm # Django user creation form
 from django.db.models import Q
 
-from .models import Room, Topic
+from .models import Room, Topic, Message
 from .forms import RoomForm
 
 # rooms = [
@@ -98,7 +99,23 @@ def home(request):
 
 def room(request, pk):
     room = Room.objects.get(id=pk)
-    context = {'room': room}
+    comments = room.message_set.all().order_by('-created')
+    participants = room.participants.all()
+    # Explanation:
+    # Filter all comments that are available in a specific room
+    # The 'message_set' comes from the model 'Message' which is the foreign key of model 'Room'
+    
+    # Create Comment Form
+    if request.method == 'POST':
+        message = Message.objects.create(
+            user = request.user,
+            room = room,
+            body = request.POST.get('body'),
+        )
+        room.participants.add(request.user) # Add user on participants list once a user comments on a topic
+        return redirect('room', pk=room.id)
+    
+    context = {'room': room, 'comments': comments, 'participants':participants}
     return render(request, 'base/room.html', context)
 
 
@@ -143,3 +160,16 @@ def deleteRoom(request, pk):
         room.delete() # delete the room on the database
         return redirect('home')
     return render(request, 'base/delete.html', {'obj': room})
+
+# Fundtion to comment room
+@login_required(login_url='login') 
+def deleteComment(request, pk):
+    comment = Message.objects.get(id=pk)
+
+    # if request.method != comment.user:
+    #     return HttpResponse("You're not allowed here")
+
+    if request.method == 'POST':
+        comment.delete() # delete the room on the database
+        return redirect('home') # we will work on this URL routing later - so that it can redirect to room page
+    return render(request, 'base/delete.html', {'obj': comment})
