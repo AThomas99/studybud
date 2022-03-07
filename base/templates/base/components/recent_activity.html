@@ -4,7 +4,7 @@
     <!-- <p>{{ room_comment }} - {{ room_comment.created|timesince }}</p> -->
     <!-- <hr> -->
     <div>
-        <small>@{{ room_comment.user }} - {{ room_comment.created|timesince }}</small> <br>
+        <small><a href="{% url 'user-profile' room_comment.user %}">@{{ room_comment.user }}</a> - {{ room_comment.created|timesince }}</small> <br>
         <small>Replied to post "{{ room_comment.room }}"</small>
         <p>{{ room_comment }}</p>
         {% if request.user == room_comment.user %}
