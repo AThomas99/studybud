@@ -121,6 +121,19 @@ def room(request, pk):
     return render(request, 'base/room.html', context)
 
 
+def userProfile(request, pk):
+    user = User.objects.get(id=pk)
+    rooms = user.room_set.all()
+    room_comments = user.message_set.all()
+    topics = Topic.objects.all()
+    context = {
+        'user': user,
+        'rooms': rooms,
+        'room_comments': room_comments,
+        'topics': topics,
+    }
+    return render(request, 'base/profile.html', context)
+
 # Function to create room
 # Added a decorator to restrict unknown users from creating a room
 @login_required(login_url='login') 
