@@ -142,6 +142,8 @@ def createRoom(request):
     if request.method == 'POST': # check if it is post method
         form = RoomForm(request.POST) # add data to the form
         if form.is_valid(): # check if it is valid
+            room = form.save(commit=False)
+            room.host = request.user # The logged-in user is the one who should create the room
             form.save() # save it 
             return redirect('home') # redirect to homepage
     context = {'form': form}
