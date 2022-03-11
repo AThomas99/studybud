@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm # Django user creation fo
 from django.db.models import Q
 
 from .models import Room, Topic, Message
-from .forms import RoomForm
+from .forms import RoomForm, UserForm
 
 # rooms = [
 #     {'id': 1, 'name': 'Lets learn python'},
@@ -139,14 +139,25 @@ def userProfile(request, pk):
 @login_required(login_url='login') 
 def createRoom(request):
     form = RoomForm()
+    topics = Topic.objects.all()
     if request.method == 'POST': # check if it is post method
-        form = RoomForm(request.POST) # add data to the form
-        if form.is_valid(): # check if it is valid
-            room = form.save(commit=False)
-            room.host = request.user # The logged-in user is the one who should create the room
-            form.save() # save it 
-            return redirect('home') # redirect to homepage
-    context = {'form': form}
+        topic_name = request.POST.get('topic') # fetch topic name from topic input on room_form.html
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+
+        Room.objects.create(
+            host = request.user,
+            topic = topic,
+            name = request.POST.get('name'),
+            description = request.POST.get('description'),
+        )
+
+        # form = RoomForm(request.POST) # add data to the form
+        # if form.is_valid(): # check if it is valid
+        #     room = form.save(commit=False)
+        #     room.host = request.user # The logged-in user is the one who should create the room
+        #     form.save() # save it 
+        return redirect('home') # redirect to homepage
+    context = {'form': form, 'topics': topics}
     return render(request, 'base/room_form.html', context)
 
 
@@ -155,15 +166,22 @@ def createRoom(request):
 def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room) # adding instance to match the room
-
+    topics = Topic.objects.all()
     if request.method == 'POST':
-        form = RoomForm(request.POST, instance=room) # targeting specific data of room instance
-        if form.is_valid():
-            form.save()
-            return redirect('home')
+        topic_name = request.POST.get('topic') # fetch topic name from topic input on room_form.html
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+        room.name = request.POST.get('name')
+        room.topic = topic
+        room.description = request.POST.get('description')
+        room.save()
+        # form = RoomForm(request.POST, instance=room) # targeting specific data of room instance
+        # if form.is_valid():
+        #     form.save()
+        return redirect('home')
     context = {
         'form': form,
         'room': room,
+        'topics': topics
     }
     return render(request, 'base/room_form.html', context)
 
@@ -190,3 +208,13 @@ def deleteComment(request, pk):
         comment.delete() # delete the room on the database
         return redirect('home') # we will work on this URL routing later - so that it can redirect to room page
     return render(request, 'base/delete.html', {'obj': comment})
+
+
+@login_required(login_url='login')
+def updateUser(request):
+    user = request.user
+    form = UserForm(instance=user)
+
+
+    context = {'form': form}
+    return render(request, 'base/update_user.html', context)
