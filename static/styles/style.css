@@ -901,7 +901,7 @@ a {
 .room,
 .participants {
   background: var(--color-dark);
-  max-height: 87.5vh;
+  max-height: 75.5vh;
   border-radius: 0.7rem;
   overflow: hidden;
   position: relative;
@@ -1058,7 +1058,7 @@ a {
   border-radius: 0.7rem;
   overflow-y: auto;
   height: 100%;
-  margin-top: 28vh;
+  margin-top: 16vh;
   padding: 0 2rem 4rem 2rem;
 }
 
