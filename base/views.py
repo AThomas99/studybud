@@ -235,3 +235,10 @@ def topicsPage(request):
 
     context = {'topics': topics}
     return render(request, 'base/topics.html', context)
+
+
+def activityPage(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    room_comments = Message.objects.filter(Q(room__topic__name__icontains=q))
+    context = {'room_comments': room_comments}
+    return render(request, 'base/activity.html', context)
