@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     # Custom applications
     'base.apps.BaseConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
