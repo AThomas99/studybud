@@ -14,9 +14,17 @@ def getRoutes(request):
     ]
     return Response(routes)
 
-
+# Returns an API of all rooms
 @api_view(['GET'])
 def getRooms(request):
     rooms = Room.objects.all()
     serialzer = RoomSerializer(rooms, many=True)
+    return Response(serialzer.data)
+
+
+# Returns an API of a single room
+@api_view(['GET'])
+def getRoom(request, pk):
+    room = Room.objects.get(id=pk)
+    serialzer = RoomSerializer(room, many=False)
     return Response(serialzer.data)
