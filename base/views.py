@@ -26,17 +26,17 @@ def loginPage(request):
 
 
     if request.method == 'POST':
-        username = request.POST.get('username').lower() # update - make all username entered be lowercase
+        email = request.POST.get('email').lower() # update - make all username entered be lowercase
         password = request.POST.get('password')
 
         # check if the user exists, if dont output a flash message
         try:
-            user = User.objects.get(username=username)
+            user = User.objects.get(email=email)
         except:
             messages.error(request, 'User does not exist') # use flash error message
 
         # Get user object and authenticate based on username and password
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=email, password=password)
 
         if user is not None: # check if there is user or no user
             login(request, user) # Login the user and add the session into the db and browser
