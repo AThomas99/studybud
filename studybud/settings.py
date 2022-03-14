@@ -124,10 +124,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = 'images/' # Media URL for user-uploaded pictures
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+# Media upload directory
+MEDIA_ROOT = BASE_DIR / 'static/images' #AWS3 Bucket in production
 
 # STATIC_ROOT = 
 
@@ -138,3 +142,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Change default user model to custom user model
+AUTH_USER_MODEL = 'base.User'
