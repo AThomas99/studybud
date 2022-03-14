@@ -5,7 +5,7 @@
       <div class="roomListRoom__header">
         <a href="{% url 'user-profile' room.host.id %}" class="roomListRoom__author">
           <div class="avatar avatar--small">
-            <img src="https://lh3.googleusercontent.com/a-/AOh14GgN06i_QW5SVBkQkLuU2--aKhYNJlRWhWvhImHrAQ=s288-p-rw-no" />
+            <img src=" {{ room.host.avatar.url }}" />
           </div>
           <span>@{{room.host.username}}</span>
           <span>{{ room.created|timesince }} ago</span>
